@@ -15,23 +15,35 @@ class DNA:
 
 class Solution:
 
-    def __init__(self, n_customers, depots, n_vehicles, instance):
+    def __init__(self, n_customers, depots, n_vehicles, instance, clusters = []):
         self.routes = []
         self.instance = instance
+        # for clusterID in  clusters:
+        #     random.shuffle(clusters[clusterID])
+        
         self.random_route = [i for i in range(1, n_customers + 1)]
         random.shuffle(self.random_route)
-        
+
         for depot in depots:
             for vehicle_number in range(1, n_vehicles + 1):
                 route = self.generateARoute(depot, self.random_route)
                 self.cleanRandomRoute(route, self.random_route)
                 self.routes.append(DNA(depot, route, vehicle_number))
+        
+        # self.random_route = [i for i in range(1, n_customers + 1)]
+        # random.shuffle(self.random_route)
+        
+        # for depot in depots:
+        #     for vehicle_number in range(1, n_vehicles + 1):
+        #         route = self.generateARoute(depot, self.random_route)
+        #         self.cleanRandomRoute(route, self.random_route)
+        #         self.routes.append(DNA(depot, route, vehicle_number))
 
     def cleanRandomRoute(self, route, random_route):
         for customer in route:
             random_route.remove(customer)
 
-    def generateARoute(self, depotID, random_route):
+    def generateARoute(self, depotID, random_route, clusterDepot = []):
         new_route = []
         initialDepot = self.instance["depot_%i" % depotID]
         lastCustomer = self.instance["depot_%i" % depotID]
@@ -41,6 +53,8 @@ class Solution:
         maximumCapacity = 200
         maximumTime = 500
         for i in range(len(random_route)):
+
+            # if (random_route[i] in clusterDepot):
             actualCustomer = self.instance["customer_%i" % random_route[i]]
             x1 = lastCustomer["coordinates"]["x"]
             y1 = lastCustomer["coordinates"]["y"]
@@ -92,11 +106,25 @@ def clustering(depots, customers, instance):
 instance = ''
 with open('data/c-mdvrptw/pr01.txt.json') as json_file:  
     instance = json.load(json_file)
-    
-clusters = clustering([49, 50, 51, 52], customers, instance)
-solution1 = Solution(48, [49, 50, 51, 52], 2, instance)
 
 customers = [i for i in range(1, 49)]
+depots = [49, 50, 51, 52]
+random.shuffle(depots)
+clusters = clustering(depots, customers, instance)
+print(clusters)
+solution1 = Solution(48, depots, 2, instance)
 print(solution1.random_route)
 for dna in solution1.routes:
-    print(dna.route, dna.depot, dna.vehicle_number)
+    print(dna.route, dna.depot, dna.vehicle_number, len(dna.route))
+
+
+# print(clusters)
+# for clusterID in clusters:
+#     random.shuffle(clusters[clusterID])
+    # random.shuffle(cluster)
+# print(clusters)
+# solution1 = Solution(48, [49, 50, 51, 52], 2, instance)
+
+# print(solution1.random_route)
+# for dna in solution1.routes:
+#     print(dna.route, dna.depot, dna.vehicle_number)
