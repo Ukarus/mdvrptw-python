@@ -72,7 +72,6 @@ class Solution:
                 child[i] = ind2[i]
 
         return child
-
         
     
     def mutate(self):
@@ -172,7 +171,7 @@ def reproduction(population, pool, mutation_rate, clusters):
         offspring.append(child1)
     return offspring
 
-def bestInd(population):
+def bestIndividual(population):
     maxFitness = 0
     bestInd = 0
     for i in range(len(population)):
@@ -194,8 +193,8 @@ def clustering(depots, csvInstance, jsonInstance):
     for depot in depots:
         newClusters[depot] = []
 
-    depotsCoordinates = [ [instance["depot_%i" % depot]["coordinates"]["x"], 
-    instance["depot_%i" % depot]["coordinates"]["y"]] for depot in depots]
+    depotsCoordinates = [ [jsonInstance["depot_%i" % depot]["coordinates"]["x"], 
+    jsonInstance["depot_%i" % depot]["coordinates"]["y"]] for depot in depots]
     x = np.array(csvInstance)
     clusters = np.array(depotsCoordinates)
     kmeans = KMeans(n_clusters=len(depots), init=clusters, n_init=1).fit(x)
@@ -207,60 +206,68 @@ def clustering(depots, csvInstance, jsonInstance):
 
     return newClusters
 
+def run_mdvrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size,
+        pop_size, cx_pb, mut_pb, n_gen, export_csv):
 
-instance = ''
-instanceName = 'pr01'
-fitnessObjective = 1083.98
-nPop = 100
-nGen = 0
-with open('data/c-mdvrptw/pr01.txt.json') as json_file:  
-    instance = json.load(json_file)
+    instance = ''
+    fitnessObjective = 1083.98
+    nPop = pop_size
+    nGen = 1
 
-number_of_customers = instance["number_of_customers"]
-depots = [i for i in range(number_of_customers + 1, number_of_customers + instance["number_of_depots"] + 1)]
-customers = [i for i in range(1, number_of_customers + 1)]
-
-pr01 = pd.read_csv(r'C:\Users\juanj\Documents\Trabajo de Titulo 2\algorithm\pr01_2.csv')
-depotsCoordinates = [ [instance["depot_%i" % depot]["coordinates"]["x"], 
-instance["depot_%i" % depot]["coordinates"]["y"]] for depot in depots]
-clusters = clustering(depots, pr01, instance)
-# clusters = {49: [7, 9, 31, 32, 35, 36, 37, 41, 42, 44, 46], 50: [3, 6, 10, 11, 22, 27, 34, 45, 48], 
-# 51: [1, 4, 5, 8, 13, 14, 16, 17, 18, 19, 20, 26, 28, 29, 33], 
-# 52: [2, 12, 15, 21, 23, 24, 25, 30, 38, 39, 40, 43, 47]}
-
-population = []
-for i in range(nPop):
-    population.append(Solution(depots, instance, clusters))
-    population[i].calculateFitness(clusters, fitnessObjective)
-
-while nGen < 75:
-    print('-- Generation {} --'.format(nGen))
-    pool = mating_pool(population)
-
-    offspring = []
-    offspring = reproduction(population, pool, 0.02, clusters)
-    for i in range(len(offspring)):
-        offspring[i].calculateFitness(clusters, fitnessObjective)
-    population = offspring
-    fits = [ind.fitness for ind in population]
-    length = len(population)
-    mean = sum(fits) / length
-    sum2 = sum(x*x for x in fits)
-    std = abs(sum2 / length - mean**2)**0.5
-    print('  Min {}'.format(min(fits)))
-    print('  Max {}'.format(max(fits)))
-    print('  Avg {}'.format(mean))
-    print('  Std {}'.format(std))
-    nGen += 1
+    with open('data/c-mdvrptw/json/%s' % instance_name) as json_file:  
+        instance = json.load(json_file)
     
-for i in range(len(population)):
-    cost = population[i].euclideanCost(population[i].ind2route(clusters))
+    number_of_customers = instance["number_of_customers"]
+    depots = [i for i in range(number_of_customers + 1, number_of_customers + instance["number_of_depots"] + 1)]
+    customers = [i for i in range(1, number_of_customers + 1)]
+
+    pr01 = pd.read_csv(r'C:\Users\juanj\Documents\Trabajo de Titulo 2\algorithm\pr01_2.csv')
+    depotsCoordinates = [ [instance["depot_%i" % depot]["coordinates"]["x"], 
+    instance["depot_%i" % depot]["coordinates"]["y"]] for depot in depots]
+    clusters = clustering(depots, pr01, instance)
+    # clusters = {49: [7, 9, 31, 32, 35, 36, 37, 41, 42, 44, 46], 50: [3, 6, 10, 11, 22, 27, 34, 45, 48], 
+    # 51: [1, 4, 5, 8, 13, 14, 16, 17, 18, 19, 20, 26, 28, 29, 33], 
+    # 52: [2, 12, 15, 21, 23, 24, 25, 30, 38, 39, 40, 43, 47]}
+
+    population = []
+    for i in range(nPop):
+        population.append(Solution(depots, instance, clusters))
+        population[i].calculateFitness(clusters, fitnessObjective)
+
+    while nGen < n_gen:
+        print('-- Generation {} --'.format(nGen))
+        pool = mating_pool(population)
+
+        offspring = []
+        offspring = reproduction(population, pool, mut_pb, clusters)
+
+        for i in range(len(offspring)):
+            offspring[i].calculateFitness(clusters, fitnessObjective)
+
+        #replace old population with offspring
+        population = offspring
+
+        #stats
+        fits = [ind.fitness for ind in population]
+        length = len(population)
+        mean = sum(fits) / length
+        sum2 = sum(x*x for x in fits)
+        std = abs(sum2 / length - mean**2)**0.5
+        print('  Min {}'.format(min(fits)))
+        print('  Max {}'.format(max(fits)))
+        print('  Avg {}'.format(mean))
+        print('  Std {}'.format(std))
+        nGen += 1
+    
+    print('-- End of evolution --')
+    for i in range(len(population)):
+        cost = population[i].euclideanCost(population[i].ind2route(clusters))
 
 
-bestInd = bestInd(population)
-print('\n')
-print("Best individual Cost: %s " % bestInd.euclideanCost(bestInd.ind2route(clusters)))
-print("Best individual Fitness: %s " % bestInd.fitness)
-print("Best individual Route: %s " % bestInd.route)
+    bestInd = bestIndividual(population)
+    print('\n')
+    print("Best individual Cost: %s " % bestInd.euclideanCost(bestInd.ind2route(clusters)))
+    print("Best individual Fitness: %s " % bestInd.fitness)
+    print("Best individual Route: %s " % bestInd.route)
 
-json_file.close()
+    json_file.close()
