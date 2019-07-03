@@ -1,9 +1,15 @@
 
 import csv
-textFile = open('./data/c-mdvrptw/pr01', 'r')
 
-with open('pr01_2.csv', 'w', newline='') as writeFile:
+instanceName = 'pr02.txt'
+textFile = open('./data/c-mdvrptw/txt/%s' % instanceName, 'r')
+
+
+
+with open(instanceName.split(".")[0] + '.csv', 'w', newline='') as writeFile:
     writer = csv.writer(writeFile)
+    firstRow = ['x', 'y']
+    writer.writerow(firstRow)
     for lineCount, line in enumerate(textFile, start=1):
         if lineCount >= 6:
             values = line.strip().split()

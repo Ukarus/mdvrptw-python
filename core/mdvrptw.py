@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
 import matplotlib.pyplot as plt
-import json, random, math
+import json, random, math, os
 
 def euclideanDistance(x1, y1, x2, y2):
     return round(math.sqrt( pow(x2 - x1, 2) + pow(y2 - y1, 2)), 3)
@@ -210,7 +210,7 @@ def run_mdvrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
         pop_size, cx_pb, mut_pb, n_gen, export_csv):
 
     instance = ''
-    fitnessObjective = 1083.98
+    fitnessObjective = 1763.07
     nPop = pop_size
     nGen = 1
 
@@ -221,7 +221,10 @@ def run_mdvrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     depots = [i for i in range(number_of_customers + 1, number_of_customers + instance["number_of_depots"] + 1)]
     customers = [i for i in range(1, number_of_customers + 1)]
 
-    pr01 = pd.read_csv(r'C:\Users\juanj\Documents\Trabajo de Titulo 2\algorithm\pr01_2.csv')
+    # pr01 = pd.read_csv(r'C:\Users\juanj\Documents\Trabajo de Titulo 2\algorithm\pr01_2.csv')
+    
+    csvPath = r'data/c-mdvrptw/csv/%s.csv' % instance_name.split(".")[0]
+    pr01 = pd.read_csv(csvPath)
     depotsCoordinates = [ [instance["depot_%i" % depot]["coordinates"]["x"], 
     instance["depot_%i" % depot]["coordinates"]["y"]] for depot in depots]
     clusters = clustering(depots, pr01, instance)
@@ -229,11 +232,13 @@ def run_mdvrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     # 51: [1, 4, 5, 8, 13, 14, 16, 17, 18, 19, 20, 26, 28, 29, 33], 
     # 52: [2, 12, 15, 21, 23, 24, 25, 30, 38, 39, 40, 43, 47]}
 
+    #population initialization
     population = []
     for i in range(nPop):
         population.append(Solution(depots, instance, clusters))
         population[i].calculateFitness(clusters, fitnessObjective)
 
+    #Generational bucle
     while nGen < n_gen:
         print('-- Generation {} --'.format(nGen))
         pool = mating_pool(population)

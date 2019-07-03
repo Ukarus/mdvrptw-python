@@ -76,11 +76,10 @@ def text2json(instance, filePath):
         depots = ['depot_%d' % x for x in range(customers+1, customers+nDepots+1)]
         customers = ['customer_%d' % x for x in range(1, customers+1)]
         asdf= distance_matrix(depots, customers, jsonData)
-        print (asdf)
         jsonData['distance_matrix'] = asdf
         """ jsonData['distance_matrix'] = [[__distance(jsonData[customer1], jsonData[customer2]) for customer1 in customers] for customer2 in customers] """
 
-        jsonFilename = '%s.json' % instance
+        jsonFilename = '%s.json' % instance.split(".")[0]
         jsonFile = os.path.join(filePath, jsonFilename)
         print ('Write to file: %s' % jsonFile)
         makeDirsForFile(jsonFile)

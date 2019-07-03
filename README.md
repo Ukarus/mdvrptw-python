@@ -5,5 +5,9 @@
 - [Scikit-learn](https://scikit-learn.org/stable/)
 - [Seaborn](https://seaborn.pydata.org/)
 - [Matplot](https://matplotlib.org/)
-- [Python] >= 3.5 (https://www.python.org/)
+- [Python 3.5+](https://www.python.org/)
+
+
+## Instalación
+
 

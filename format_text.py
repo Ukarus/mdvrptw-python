@@ -6,9 +6,9 @@ from core.utils import text2json
 
 def main():
 
-    instance= 'pr01.txt'
+    instance= 'pr02.txt'
     rootpath = getrootpath()
-    filePath = os.path.join(rootpath,'data','c-mdvrptw')
+    filePath = os.path.join(rootpath,'data','c-mdvrptw','txt')
 
     #Función para formatear datos en formato json
     text2json(instance,filePath)
