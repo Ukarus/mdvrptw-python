@@ -66,13 +66,13 @@ def text2json(instance, filePath):
                 }
             else:
                 values = line.strip().split()
-                jsonData["depot_%s" %values[0]] = {
+                jsonData["depot_%s" %values[0]].update({
                      "coordinates":{
                         "x": float(values[1]),
                         "y": float(values[2])
                     },
                     "latest_time": values[8]
-                }
+                })
         depots = ['depot_%d' % x for x in range(customers+1, customers+nDepots+1)]
         customers = ['customer_%d' % x for x in range(1, customers+1)]
         asdf= distance_matrix(depots, customers, jsonData)

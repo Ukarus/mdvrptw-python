@@ -106,7 +106,7 @@ def reproduction(population, pool, mutation_rate):
 population = []
 mutation_rate = 0.02
 population_n = 200
-phrase = 'the cat at my source code'
+phrase = 'the cat ate my source code'
 generations = 130
 n = 0
 max_fitness = 0
@@ -117,32 +117,32 @@ for i in range(population_n):
     dna = DNA(phrase)
     dna.calculate_fitness()
     population.append(dna)
-random_index = random.randint(0, len(population) - 1)
-newAgent = climbing_hill(population, random_index)
-print(newAgent.fitness, newAgent.getPhenotype())
-# print (climbing_hill(population, random.choice(population) ))
+# random_index = random.randint(0, len(population) - 1)
+# newAgent = climbing_hill(population, random_index)
+# print(newAgent.fitness, newAgent.getPhenotype())
+# # print (climbing_hill(population, random.choice(population) ))
 
-# #check if in the initial population there is at least one that is a exact match against the phrase
-# is_target = check_phrase(population, phrase)
+#check if in the initial population there is at least one that is a exact match against the phrase
+is_target = check_phrase(population, phrase)
 
-# while is_target == False:
-#     #calculate fitness
-#     for i in range(len(population)):
-#         population[i].calculate_fitness()
+while is_target == False:
+    #calculate fitness
+    for i in range(len(population)):
+        population[i].calculate_fitness()
 
-#     # build a mating pool
-#     pool = mating_pool(population) #selection
-#     population = reproduction(population, pool, mutation_rate)
-#     is_target = check_phrase(population, phrase)
-#     n += 1
+    # build a mating pool
+    pool = mating_pool(population) #selection
+    population = reproduction(population, pool, mutation_rate)
+    is_target = check_phrase(population, phrase)
+    n += 1
 
-# for i in range(len(population)):
-#     population[i].calculate_fitness()
-#     if population[i].fitness > max_fitness:
-#         best_gen = population[i]
-#         max_fitness = best_gen.fitness
-# print('\n')
-# print(best_gen.genes, best_gen.fitness, n)
+for i in range(len(population)):
+    population[i].calculate_fitness()
+    if population[i].fitness > max_fitness:
+        best_gen = population[i]
+        max_fitness = best_gen.fitness
+print('\n')
+print(best_gen.genes, best_gen.fitness, n)
 # for i in range(len(population)):
 #     print (population[i].genes, population[i].fitness)
 
@@ -169,3 +169,4 @@ print(newAgent.fitness, newAgent.getPhenotype())
 
 
 # print(createPopulation(50))
+
